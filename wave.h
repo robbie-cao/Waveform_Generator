@@ -49,7 +49,7 @@ void Voltage_Reference_Init(void);
 void DAC_Init(void);
 void Interrupts_Init(void);
 void Play_Note(char note);
-void push_button();
-void push_buttonP3();
+void push_button(void);
+void push_buttonP3(void);
 
 #endif    
