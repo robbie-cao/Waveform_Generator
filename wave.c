@@ -105,7 +105,7 @@ code unsigned int sin[256] =
 --------------------------------------------------------------------------------------------------------------------*/
 void main(void)
 {
-    //  initialising
+    // initialising
 	General_Init();
 	Timer_Init();
 	Voltage_Reference_Init();
