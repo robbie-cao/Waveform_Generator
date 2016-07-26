@@ -117,7 +117,6 @@ void main(void)
 			//if MPB is pressed, change the system state and dont exit the loop until it is let go
 			if (buttonP3)
 			{	
-								
 				State  = State + 1;
 				if (State == 4)
 				{
@@ -126,19 +125,18 @@ void main(void)
 				while(~MPB);
 			}
 		}
-		
 		/*------------------------------------------------------------------------------
 				PLAY STATE
 		--------------------------------------------------------------*/
 		if (State == 1)			
 		{
-            // initialise variables
+        		 // initialise variables
 			P2 = 0;
 			poly_count = 0;
 			TR0 = 0;
 
-            // Checks which buttons were pressed and assigns the number of buttons and the frequencies of those buttons to the
-            //  interrupt vector
+            		// Checks which buttons were pressed and assigns the number of buttons 
+            		// and the frequencies of those buttons to the interrupt vector
 			if ((P1&0x01)&&(~P1&0x02))
 			{
 				Play_Note('C');
@@ -224,13 +222,13 @@ void main(void)
 				poly_count++;
 			}
 
-            // Keeps playing the same notes until one or more is let go
+            		// Keeps playing the same notes until one or more is let go
 			P1temp = P1;
 			while (P1 == P1temp)
 			{
 				push_buttonP3();
                 
-                // if the state change button is pressed, change states
+        			// if the state change button is pressed, change states
 				if (buttonP3)
 				{
 					P1temp++;
@@ -239,7 +237,7 @@ void main(void)
 				}
 			}
             
-            // reinitialising variables
+        		// reinitialising variables
 			TR2 = 0;
 			P2 = 0;
 			poly_count = 0;
@@ -257,9 +255,8 @@ void main(void)
 			phi5 = 0;
 			phi6 = 0;
 			phi7 = 0;
-							
 		} 
-		/*------------------------------------------------------------------------------
+		/*---------------------------------------------------------------------
 				VOLUME STATE
 		----------------------------------------------------------------------*/
 		else if (State == 3)	//If the volume state is selected
@@ -268,7 +265,6 @@ void main(void)
 			TR0 = 1;	
 			freq1 = 0;	
 			button = 0xFF;
-			
 			//if button is pushed
 			if (~P1 > 0)
 			{
@@ -307,15 +303,12 @@ void main(void)
 			}
 		// sets LED states for volume display
 		LED_state = Vol_LED[volume_count]|LED_state;
-			
 		P2 = LED_state;
-
 		LED_state = LED_state&0x01;
-
 		}		
-
-		/*  Theremin */
-		
+		/*---------------------------------------------------------------------
+				Theremin
+		----------------------------------------------------------------------*/
 		else if (State == 2)
 		{
 			P2 = 0xFF;			
@@ -323,9 +316,7 @@ void main(void)
 			SFRPAGE   = TMR2_PAGE;
 			TR2 = 1;
 			SFRPAGE   = TIMER01_PAGE;
-
 			TH1 = 0xFA;
-			
 			ET2 = 0;			
 			// send pulse for ultrasonic
 			TR1 = 1;		//timer 1 on
@@ -334,14 +325,6 @@ void main(void)
 			P0_2 = 1;		
 			while(~TF1);
 			TF1 = 0;
-
-			P0_2 = 0;
-			while (~TF1);
-			TF1 = 0;
-			P0_2 = 1;		
-			while(~TF1);
-			TF1 = 0;
-
 			P0_2 = 0;
 			while (~TF1);
 			TF1 = 0;
@@ -349,15 +332,18 @@ void main(void)
 			while(~TF1);
 			TF1 = 0;
 			P0_2 = 0;
-	
+			while (~TF1);
+			TF1 = 0;
+			P0_2 = 1;		
+			while(~TF1);
+			TF1 = 0;
+			P0_2 = 0;
 			ET2 = 1;				
 
 			/* Mask time */
 			TH1 = 0x53;
 			while(~TF1);
 			TF1 = 0;
-			
-			
 			TH1 = 0xF6;   // 10 system clocks until overflow
 							
 			while (count < 51)		//while time elapsed is less than 51*10 system clock cycles (~1ms)
@@ -373,7 +359,6 @@ void main(void)
 						counts_reached=1;
 					}
 				}
-			
 			}	
 			//if no RX was detected, default counts to count
 			if (counts_reached = 0)
@@ -385,7 +370,6 @@ void main(void)
 			count = 0;		
 			// sets frequency as a scalar of the tiem difference for TX and RX
 			freq1 = counts*200;
-			
 			TH1 = 0x00;
 			TR1 = 1;
 			for(j=0;j<20;j++)
@@ -393,7 +377,6 @@ void main(void)
 				while(~TF1);
 				TF1 = 0;
 			}
-			
 			TR1 = 0;
 			SFRPAGE   = TMR2_PAGE;
 			TR2 = 0;
@@ -402,8 +385,13 @@ void main(void)
 	}
 }
 
-/*--------------------------------------------------------------------------------------------------------------------
+/*-------------------------------------------
         Functions
+---------------------------------------------*/
+/*--------------------------------------------------------------------------------------------------------------------
+        Function:        General_Init
+
+        Description:     Initialises generic 8051 registers for peripherals
 --------------------------------------------------------------------------------------------------------------------*/
 void General_Init()
 {
@@ -413,52 +401,65 @@ void General_Init()
 	P0MDOUT = 0x00;		// set P0.0 to be input for timer enable bit
 	P1MDOUT = 0x00; 	// Set port 1 to input (automatically 0 at reset)
 	P2MDOUT = 0xff;		// Need to make pushpull outputs to drive LEDs properly
-	OSCICN    = 0x83;
+	OSCICN = 0x83;
 
 	XBR2 = 0x40;	//turns on crossbar
 	//XBR1 = 0x20;	//routes timer 2 enable bit to port pin
 	P2 = 0;
-
 	P0_2 = 1;
 }
+/*--------------------------------------------------------------------------------------------------------------------
+        Function:         Timer_Init
 
+        Description:     Initialises the timer control registers
+--------------------------------------------------------------------------------------------------------------------*/
 void Timer_Init()
 {
-	SFRPAGE   = TMR2_PAGE;
-    TMR2CF    = 0x08;
+	SFRPAGE = TMR2_PAGE;
+    	TMR2CF = 0x08;
 	//RCAP2H = 0xFD;
 	//RCAP2L = 0x13;
 
 	RCAP2H = 0xFD;
 	RCAP2L = 0x0A;
 
-	SFRPAGE   = TIMER01_PAGE;
-   	TMOD      = 0x21;
-    CKCON     = 0x02;
-    TL0       = 0x9E;
-    TH0       = 0x38;
-	TL1		  = 0xAA;
-	TH1		  = 0xFE;
+	SFRPAGE = TIMER01_PAGE;
+   	TMOD = 0x21;
+    	CKCON = 0x02;
+    	TL0 = 0x9E;
+    	TH0 = 0x38;
+	TL1 = 0xAA;
+	TH1 = 0xFE;
 
-    SFRPAGE   = TMR3_PAGE;
-    TMR3CF    = 0x08;
-
+    SFRPAGE = TMR3_PAGE;
+    TMR3CF = 0x08;
 }
+/*--------------------------------------------------------------------------------------------------------------------
+        Function:         Voltage_Reference_Init
 
-void Voltage_Reference_Init()
+        Description:     Initialises the ADC
+--------------------------------------------------------------------------------------------------------------------*/
+void Voltage_Reference_Init(void)
 {
 	SFRPAGE   = ADC0_PAGE;
 	REF0CN    = 0x03; // Turn on internal bandgap reference and output buffer to get 2.4V reference (pg 107)
 }
+/*--------------------------------------------------------------------------------------------------------------------
+        Function:        DAC_Init
 
-void DAC_Init()
+        Description:     Initialises the DAC control registers
+--------------------------------------------------------------------------------------------------------------------*/
+void DAC_Init(void)
 {
 	SFRPAGE = DAC0_PAGE;
 	DAC0CN 	= 0x80;
-  
 }
+/*--------------------------------------------------------------------------------------------------------------------
+        Function:        Interrupts_Init
 
-void Interrupts_Init()
+        Description:    Initialises the global and timer interrupts
+--------------------------------------------------------------------------------------------------------------------*/
+void Interrupts_Init(void)
 {
 	IE        = 0xA2;  // Global enable interrupt + timer 2 interrupt
 	EIE2      = 0x01;
@@ -468,7 +469,6 @@ void Interrupts_Init()
         Function:         Timer0_ISR
 
         Description:     used to pulse 1Hz wave
-
 --------------------------------------------------------------------------------------------------------------------*/
 void Timer0_ISR (void) interrupt 1
 {
@@ -488,33 +488,24 @@ void Timer0_ISR (void) interrupt 1
         Function:         Timer2_ISR
 
         Description:     Produces a sine wave based on the frequencies of individual inputs and the number of inputs
-
 --------------------------------------------------------------------------------------------------------------------*/
-
 void Timer2_ISR (void) interrupt 5
 {
 	// extracts the high bytes from the phasor variables
 	phi1HB = phi1 & 0xFF00;
 	phi1HB = phi1HB>>8;
-
 	phi2HB = phi2 & 0xFF00;
 	phi2HB = phi2HB>>8;
-
 	phi3HB = phi3 & 0xFF00;
 	phi3HB = phi3HB>>8;
-
 	phi4HB = phi4 & 0xFF00;
 	phi4HB = phi4HB>>8;
-
 	phi5HB = phi5 & 0xFF00;
 	phi5HB = phi5HB>>8;
-	
 	phi6HB = phi6 & 0xFF00;
 	phi6HB = phi6HB>>8;
-
 	phi7HB = phi7 & 0xFF00;
 	phi7HB = phi7HB>>8;
-
 	// adds together multiple sine waves based on the number of inputs
 	temp = sin[(unsigned char)phi1HB];
 	
@@ -542,49 +533,33 @@ void Timer2_ISR (void) interrupt 5
 	{
 		temp = temp + sin[(unsigned char)phi7HB];
 	}
-
 	// scales the output based on the volume control
 	temp = temp/(poly_count*volume_level);
-	
 	// splits the sine value into high and low bytes
 	tempL = temp & 0x00FF;
 	tempH = temp & 0xFF00;
 	tempH = tempH>>8;
-
 	// sets the dac to the high and low bytes
 	DAC0L = (unsigned char)tempL;
 	DAC0H = (unsigned char)tempH;
-
 	// increments the phasor variables based on the frequency
 	phi1 = phi1 + (freq1*2);
-
 	phi2 = phi2 + (freq2*2);
-
 	phi3 = phi3 + (freq3*2);
-
 	phi4 = phi4 + (freq4*2);
-
 	phi5 = phi5 + (freq5*2);
-
 	phi6 = phi6 + (freq6*2);
-
 	phi7 = phi7 + (freq7*2);
-
-
-	TF2 = 0;        // Reset Interrupt							      // Restore SFR page
+	TF2 = 0;        // Reset Interrupt
 	return;
 }
-
 /*--------------------------------------------------------------------------------------------------------------------
         Function:         Push button port 3
 
         Description:     debounces the port 3 buttons
-
 --------------------------------------------------------------------------------------------------------------------*/
 void push_buttonP3(){
-
 	unsigned char test1, test2;
-		
 		//read first value
 		test1 = P3;
 		//wait
@@ -603,46 +578,35 @@ void push_buttonP3(){
 				buttonP3 = ~buttonP3;
 				buttonP3 = buttonP3 & 0x80;
 		}
-
 		return;	
 }
-
 /*--------------------------------------------------------------------------------------------------------------------
-        Function:         push button port 1
+        Function:        push button port 1
 
         Description:     debounces the port 1 buttons
-
 --------------------------------------------------------------------------------------------------------------------*/
 void push_button(){
-
 	unsigned char test1, test2;
-		
 		// same as previous function
 		test1 = P1;
-	
 		TL1		  = 0xAA;
 		TH1		  = 0xFE;
-
 		TR1 = 1;
 		while(~TF1);
 		TR1 = 0;
 		TF1 = 0;
-		
 		test2 = P1;
-
 		if (test1 == test2)
 		{		
 				button = test2;
 		}
-
 		return;	
 }
-
 /*--------------------------------------------------------------------------------------------------------------------
-        Function:         Play note
+        Function:       Play note
 
         Description:    assigns different notes to different frequency variables based on what notes were passed
-						when the button was pressed.
+			when the button was pressed.
 --------------------------------------------------------------------------------------------------------------------*/
 void Play_Note(char note)
 {
@@ -1014,7 +978,5 @@ void Play_Note(char note)
 			}
 		break;
 	}
-
 	return;
-
 }
