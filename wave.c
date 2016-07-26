@@ -6,12 +6,6 @@ ________________________________________________________________________________
 #include <C8051F120_defs.h>     // SFR declarations
 #include "Assign2.h"
 
-// function prototypes
-
-void Play_Note(char note);
-void push_button();
-void push_buttonP3();
-
 // global variables
 
 unsigned char DAClevel = 0x00;
