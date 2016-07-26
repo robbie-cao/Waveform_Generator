@@ -1,17 +1,8 @@
 /*_____________________________________________________________________________________________________________________
-
-        Project:        
-        Module:         
-        Author:         
-        Date:           
-
-        Description:
-        
-
-        Revisions:
-
-
-_______________________________________________________________________________________________________________________*/
+        Project: Waveform Generator    
+        Author: Jesse Nolan    
+        Description: Generates sinusoidal waveforms in the chromatic scale with volume control and multi note functionality
+        _______________________________________________________________________________________________________________________*/
 
 #ifndef Assign2_h
 #define Assign2_h
